@@ -1,25 +1,4 @@
-﻿pour se connecter : 
-    ssh -X filleul@osr-etudiant.unistra.fr
-    mdp ENT
-    mysql -h osr-mysql.unistra.fr[-u <loginBDD>] -p [<base>]
-    mdp BDD
-    use base (ici base est "filleul" je crois)
-    
-
-pour transferer des fichiers .php :
-    scp <fichier>.php filleul@osr-etudiant.unistra.fr:/web/filleul/public_html
-
-pour ouvrir un lien : https://osr-etudiant.unistra.fr/~filleul/<fichier>.php
-
-<--- Eventuellement rajouter des "NOT NULL" un peu partout --->
-
-Pour enlever verification des foreign key :
-set foreign_key_checks = 0;
-
-Supprimer des tables :
-drop table <table>;
-
-create table Droit(
+﻿create table Droit(
     ID int unique auto_increment,
     Signification varchar(255) unique,
     primary key (ID) 
