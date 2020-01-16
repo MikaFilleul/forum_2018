@@ -1,0 +1,103 @@
+﻿pour se connecter : 
+    ssh -X filleul@osr-etudiant.unistra.fr
+    mdp ENT
+    mysql -h osr-mysql.unistra.fr[-u <loginBDD>] -p [<base>]
+    mdp BDD
+    use base (ici base est "filleul" je crois)
+    
+
+pour transferer des fichiers .php :
+    scp <fichier>.php filleul@osr-etudiant.unistra.fr:/web/filleul/public_html
+
+pour ouvrir un lien : https://osr-etudiant.unistra.fr/~filleul/<fichier>.php
+
+<--- Eventuellement rajouter des "NOT NULL" un peu partout --->
+
+Pour enlever verification des foreign key :
+set foreign_key_checks = 0;
+
+Supprimer des tables :
+drop table <table>;
+
+create table Droit(
+    ID int unique auto_increment,
+    Signification varchar(255) unique,
+    primary key (ID) 
+);
+
+create table Utilisateur(
+    ID int unique auto_increment,
+    Login varchar(255) unique not null,
+    Mot_de_passe varchar(255) not null,
+    Pseudo varchar(255) unique not null,
+    Adresse_mail varchar(255) unique not null,
+    ID_du_droit int,
+    primary key (ID),
+    foreign key (ID_du_droit) references Droit(ID)
+);
+
+create table Categorie(
+    ID int unique auto_increment,
+    Intitule varchar(255) unique,
+    ID_createur int,
+    primary key (ID),
+    foreign key (ID_createur) references Utilisateur(ID)
+);
+
+create table Topic(
+    ID int unique auto_increment,
+    Note_moyenne int default 0,
+    Date_modif date,
+    ID_createur int,
+    ID_categorie int,
+    primary key (ID),
+    foreign key (ID_createur) references Utilisateur(ID),
+    foreign key (ID_categorie) references Categorie(ID)
+);
+
+create table Topic_Note(
+    ID int unique auto_increment,
+    Note int,
+    ID_createur int,
+    ID_topic int,
+    primary key (ID),
+    foreign key (ID_createur) references Utilisateur(ID),
+    foreign key (ID_topic) references Topic(ID)
+);
+
+create table Commentaire(
+    ID int unique,
+    Intitule varchar(255),
+    Note_totale int default 0,
+    Date_ecriture date,
+    ID_createur int,
+    ID_topic int,
+    primary key (ID),
+    foreign key (ID_createur) references Utilisateur(ID),
+    foreign key (ID_topic) references Topic(ID)
+);
+
+create table Commentaire_Note(
+    ID int unique,
+    Note int,
+    ID_createur int unique,
+    ID_commentaire int,
+    primary key (ID),
+    foreign key (ID_createur) references Utilisateur(ID),
+    foreign key (ID_commentaire) references Commentaire(ID)
+);
+
+
+
+//mettre cette partie dans un fichier à part pour faciliter l'acces par d'autres fichiers
+define('SQL_DSN', 'mysql:host=osr-mysql.unistra.fr; dbname=filleul');
+define('SQL_USERNAME', 'filleul');
+define('SQL_PASSWORD', ''); //à préciser plus tard;
+
+try{
+    $db = new PDO(SQL_DSN, SQL_USERNAME, SQL_PASSWORD);
+}
+catch(Exception $e){
+    echo 'Erreur de connexion à la BDD : ' . $e->getMessage();
+    exit;
+}
